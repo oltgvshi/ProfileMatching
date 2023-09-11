@@ -1,0 +1,46 @@
+﻿@model List<ProfileMatching.Models.ApplicantsPerJob>
+
+@{
+    ViewData["Title"] = "Hired Applicants";
+}
+
+<div class="container">
+    <h1>Hired Applicants</h1>
+
+    @if (Model.Count == 0)
+    {
+        <h3>No hired applicants found.</h3>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Applicant Name</th>
+                    <th>Job Post</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var applicant in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => applicant.ApplicationUser.FirstName) @Html.DisplayFor(modelItem => applicant.ApplicationUser.LastName)</td>
+                        <td>@Html.DisplayFor(modelItem => applicant.JobPost.JobPostName)</td>
+                        <td>
+                            <form asp-controller="ApplicantsPerJobs" asp-action="HireApplicant" method="post" asp-route-hired="@applicant.HiredStatus" asp-route-id="@applicant.ApplicantPerJobId">
+                                @if (applicant.HiredStatus)
+                                {
+                                    <button class="btn btn-danger btn-sm">Unhire</button>
+                                }
+                            </form>
+                        </td>
+                        <td>
+                            <a asp-controller="FreelancerProfile" asp-action="View" asp-route-id="@applicant.ApplicationUser.Id" class="btn btn-primary btn-sm">View Profile</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

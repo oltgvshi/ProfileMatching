@@ -1,0 +1,113 @@
+﻿@model IEnumerable<ProfileMatching.Models.ApplicantsPerJob>
+
+@{
+    ViewData["Title"] = "MyJobApplications";
+
+    Pager pager = new Pager();
+    int pageNo = 0;
+
+    if(ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+
+<div class="container">
+<h1>Your Job Applications:</h1>
+
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="row gy-3">
+@foreach (var item in Model)
+{
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@Html.DisplayFor(modelItem => item.JobPost.JobPostName)</h5>
+                <h6 class="card-title">@Html.DisplayFor(modelItem => item.JobPost.Category.CategoryName) | @Html.DisplayFor(modelItem => item.JobPost.CompanyName)</h6>
+                <p class="card-text" id="FreelancerDescriptionCss">@Html.DisplayFor(modelItem => item.JobPost.JobPostDescription)</p>
+
+                <hr class="hr" />
+
+                <div class="d-flex mb-3 justify-content-between">
+                @if (item.HiredStatus)
+                {
+                     <span class="badge bg-success  d-flex align-items-center justify-content-center mx-auto text-center" style="font-size: 1em; height: 30px; width: 100%;">Status: Hired</span>
+                }
+                 else
+                 {
+                    <div class="p me-3">@Convert.ToDateTime(item.JobPost.JobApplicationDeadline).ToString("dd/MM/yyyy")</div>
+                    <div class="p me-3">-</div>
+                    <div class="p">@Convert.ToDateTime(item.JobPost.JobLength).ToString("dd/MM/yyyy")</div>
+                 }
+                </div>
+
+                <hr class="hr" />
+
+                <div class="d-flex justify-content-between mb-2">
+                    <div class="p fw-bold">Budget</div>
+                    <div class="p">@item.JobPost.JobPostBudget.ToString("#,##0.00") €</div>
+                </div>
+
+                <hr class="hr" />
+
+                @if (((List<int?>)ViewBag.AppliedJobs).Contains(item.JobPostId))
+                {
+                    <form asp-controller="ApplicantsPerJobs" asp-action="UnApply" method="post" asp-route-id="@item.JobPostId">
+                        <button class="btn btn-outline-primary btn-sm mb-1" style="width:100%;">UnApply</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-controller="ApplicantsPerJobs" asp-action="ApplyForJob" method="post" asp-route-id="@item.JobPostId">
+                        <button class="btn btn-primary btn-sm mb-1" style="width:100%;">Apply</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+            </div>
+        </div>
+    </div>
+
+
+<div class="container">
+    @if(pager.TotalPages > 0)
+    {
+        <ul class="pagination justify-content-end">
+            @if(pager.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="MyJobApplications" asp-route-pg="1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="MyJobApplications" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                </li>
+            }
+
+            @for(var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+            {
+                <li class="page-item @(pge==pager.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="MyJobApplications" asp-route-pg="@pge"> @pge</a>
+                </li>
+            }
+
+            @if(pager.CurrentPage < pager.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="MyJobApplications" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="MyJobApplications" asp-route-pg="@(pager.TotalPages)">Last</a>
+                </li>
+        
+            }
+
+        </ul>
+    }
+
+</div>
+</div>

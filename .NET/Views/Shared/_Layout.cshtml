@@ -1,0 +1,142 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+
+@{
+    // Get the custom variable from the user's claims
+    var customVariable = User.FindFirstValue("NewJobPosts");
+    var hiredJobs = User.FindFirstValue("HiredJobsCount");
+    var applicantsCount = User.FindFirstValue("ApplicantsCount");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ProfileMatching</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProfileMatching.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+          <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container">
+            <a class="navbar-brand" href="/"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-md-auto gap-2">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                                <li class="nav-item rounded">
+                                    <a class="nav-link" href="http://localhost:3000">Go to JobMatchConnect</a>
+                                </li>
+
+                                <li class="nav-item rounded notification-item">
+                                    <a class="nav-link active" aria-current="page" href="/JobPosts">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                                        </svg>
+
+                                         @if (User.IsInRole("Freelancer")) {
+                                             @if (!(customVariable.Equals("0"))){
+                                                 <a href="@Url.Action("Index", "JobSuggestions")" style="text-decoration: none; color: white;">
+                                                   <span> @customVariable New Job Posts!</span>
+                                                  </a>
+                                             }
+                                             @if (!(hiredJobs.Equals("0"))){
+                                                <a href="@Url.Action("MyJobApplications", "ApplicantsPerJobs")" style="text-decoration: none; color: white;">
+                                                    @if(hiredJobs.Equals("1")){
+                                                        <span>@hiredJobs job has hired you!</span>
+                                                    }
+                                                    else{
+                                                         <span>@hiredJobs jobs have hired you!</span>
+                                                    }
+                                                </a>
+
+                                             }
+                                         }
+
+                                        @if (User.IsInRole("Client"))
+                                        {
+                                             @if (!(applicantsCount.Equals("0"))){
+                                                   <span> @applicantsCount new applicants to your jobs!</span>
+                                             }
+                                        }
+                                </a>
+                                 
+                                </li>
+                            
+                        }
+
+                <li class="nav-item rounded">
+                  <a class="nav-link active" aria-current="page" href="/"><i class="bi bi-house-fill me-2"></i>Home</a>
+                </li>
+                        
+                        
+                @if (!User.IsInRole("Freelancer"))
+                        {
+                            
+
+                            <li class="nav-item rounded">
+                                <a class="nav-link" href="/freelancers"><i class="bi bi-people-fill me-2"></i>Freelancers</a>
+                            </li>
+                        }
+
+                @if (!User.IsInRole("Client"))
+                        {
+                            <li class="nav-item rounded">
+                                <a class="nav-link" href="/clients"><i class="bi bi-people-fill me-2"></i>Clients</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Client") || User.IsInRole("Freelancer"))
+                        {
+                            <li class="nav-item rounded">
+                                <a class="nav-link" href="/contacts/create"><i class="bi bi-telephone-fill me-2"></i>Contact</a>
+                            </li>
+                        }
+                        @*<li class="nav-item dropdown rounded">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person-fill me-2"></i>Profile</a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#">Account</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                  </ul>
+                </li>*@
+                <partial name="_LoginPartial" />
+              </ul>
+            </div>
+          </div>
+        </nav>
+    </header>
+
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+       
+    </div>
+
+    
+
+    <div class="bg-dark text-white">
+        <p class="text-center p-4 m-0">Copyright &#169; JobMatch - All rights reserved</p>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

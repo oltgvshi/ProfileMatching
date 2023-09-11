@@ -1,0 +1,103 @@
+﻿@model IEnumerable<ProfileMatching.Models.ApplicantsPerJob>
+
+@{
+    ViewData["Title"] = "ShowJobApplicants";
+
+    Pager pager = new Pager();
+    int pageNo = 0;
+
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+
+<div class="container">
+    <h1>Applicants for Job "@ViewBag.JobName"</h1>
+
+    @if (Model.Count() == 0)
+    {
+        <h3>Nothing to show here.</h3>
+    }
+    else
+    {
+
+        <div class="card my-3">
+            <div class="card-body">
+                <div class="row gy-3">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h6 class="card-title">@Html.DisplayFor(modelItem => item.JobPost.JobPostName) | @Html.DisplayFor(modelItem => item.ApplicationUser.FirstName) @Html.DisplayFor(modelItem => item.ApplicationUser.LastName)</h6>
+                                        <a asp-controller="FreelancerProfile" asp-action="View" asp-route-id="@item.ApplicationUser.Id" class="btn btn-primary btn-sm mb-1 w-50">View Profile</a>
+                                    </div>
+
+                                    <hr>
+
+                                    <form asp-controller="ApplicantsPerJobs" asp-action="Delete" method="post" asp-route-id="@item.ApplicantPerJobId">
+                                        <button class="btn btn-danger btn-sm mb-1" style="width:100%;">Delete Application</button>
+                                    </form>
+
+                                    <form asp-controller="ApplicantsPerJobs" asp-action="HireApplicant" method="post" asp-route-hired="@item.HiredStatus" asp-route-id="@item.ApplicantPerJobId">
+                                        @if(@item.HiredStatus)
+                                        {
+                                            <button class="btn btn-danger btn-sm mb-1" style="width:100%;">Unhire</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-primary btn-sm mb-1" style="width:100%;">Hire</button>
+                                        }
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container">
+            @if (pager.TotalPages > 0)
+            {
+                <ul class="pagination justify-content-end">
+                    @if (pager.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="Index" asp-route-pg="1">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="Index" asp-route-pg="@(pager.CurrentPage-1)">Previous</a>
+                        </li>
+                    }
+
+                    @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                    {
+                        <li class="page-item @(pge==pager.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="Index" asp-route-pg="@pge"> @pge</a>
+                        </li>
+                    }
+
+                    @if (pager.CurrentPage < pager.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="Index" asp-route-pg="@(pager.CurrentPage+1)">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="ApplicantsPerJobs" asp-action="Index" asp-route-pg="@(pager.TotalPages)">Last</a>
+                        </li>
+
+                    }
+
+                </ul>
+            }
+
+        </div>
+
+
+    }
+</div>
